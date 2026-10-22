@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0891b2">
+  <title>바다 친구 숫자 놀이</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐠</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bubbles" id="bubbles" aria-hidden="true"></div>
+
+  <main class="app">
+    <section class="screen screen--home is-active" id="homeScreen" aria-label="바다 친구 숫자 놀이 시작">
+      <div class="home-inner">
+        <header class="home-head">
+          <p class="eyebrow">🐚 다섯 살 바다 친구들과 함께</p>
+          <h1 class="home-title" id="homeTitle">
+            <span>바다 친구</span>
+            <span>숫자 놀이</span>
+          </h1>
+          <p class="subtitle">1부터 10까지, 더하기·빼기를 놀며 배워요!</p>
+        </header>
+
+        <div class="friend-parade" aria-hidden="true">
+          <span class="friend">🐢</span>
+          <span class="friend">🐙</span>
+          <span class="friend">🐠</span>
+          <span class="friend">🦀</span>
+          <span class="friend">🐬</span>
+        </div>
+
+        <p class="choose-label">어떤 놀이를 할까요?</p>
+
+        <div class="mode-grid">
+          <button class="mode-card mode-card--add" type="button" data-mode="add">
+            <span class="mode-icon" aria-hidden="true">➕</span>
+            <span class="mode-text">
+              <span class="mode-name">더하기</span>
+              <span class="mode-desc">친구들이 점점 늘어나요</span>
+            </span>
+          </button>
+          <button class="mode-card mode-card--sub" type="button" data-mode="sub">
+            <span class="mode-icon" aria-hidden="true">➖</span>
+            <span class="mode-text">
+              <span class="mode-name">빼기</span>
+              <span class="mode-desc">친구들이 하나둘 사라져요</span>
+            </span>
+          </button>
+          <button class="mode-card mode-card--mix" type="button" data-mode="mix">
+            <span class="mode-icon" aria-hidden="true">🌈</span>
+            <span class="mode-text">
+              <span class="mode-name">섞어서</span>
+              <span class="mode-desc">더하기도 빼기도 함께!</span>
+            </span>
+          </button>
+        </div>
+
+        <p class="sound-hint">🔊 소리를 켜면 문제를 읽어 줘요</p>
+      </div>
+    </section>
+
+    <section class="screen screen--game" id="gameScreen" aria-label="숫자 놀이">
+      <div class="game-top">
+        <button class="icon-btn" id="homeBtn" type="button" aria-label="놀이 선택으로 돌아가기">🏠</button>
+        <div class="progress-box">
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-meta">
+            <span id="progressText">문제 1 / 10</span>
+            <span id="scoreText">⭐ 0</span>
+          </div>
+        </div>
+        <button class="icon-btn sound-btn" id="soundBtn" type="button" aria-label="소리 끄기" aria-pressed="true">🔊</button>
+      </div>
+
+      <div class="question-card" id="questionCard">
+        <div class="question-top">
+          <span class="mode-pill" id="modePill">➕ 더하기</span>
+          <button class="repeat-btn" id="repeatBtn" type="button">🔈 다시 듣기</button>
+        </div>
+        <h1 class="question-text" id="questionText" aria-live="polite"></h1>
+        <div class="visual-row" id="visualRow" role="img"></div>
+      </div>
+
+      <div class="answers" id="answers"></div>
+      <div class="feedback-wrap">
+        <p class="feedback" id="feedback" aria-live="assertive"></p>
+      </div>
+    </section>
+
+    <section class="screen screen--end" id="endScreen" aria-label="놀이 결과">
+      <div class="end-card">
+        <p class="end-eyebrow">🌊 오늘의 놀이 끝!</p>
+        <h1 class="end-title" id="endTitle">참 잘했어요!</h1>
+        <div class="star-rating" id="starRating" aria-label="별 세 개 중 세 개"></div>
+        <p class="end-score" id="endScore">10문제 중 10개를 맞혔어요!</p>
+        <div class="end-friends" aria-hidden="true">
+          <span>🐳</span>
+          <span>🐙</span>
+          <span>🐢</span>
+          <span>🦀</span>
+          <span>🐠</span>
+        </div>
+        <div class="end-buttons">
+          <button class="btn btn--primary" id="againBtn" type="button">한 번 더! 🔁</button>
+          <button class="btn btn--secondary" id="chooseBtn" type="button">다른 놀이 🏠</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
+  <script src="game.js" defer></script>
+</body>
+</html>
