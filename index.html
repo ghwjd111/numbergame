@@ -23,7 +23,7 @@
             <span>바다 친구</span>
             <span>숫자 놀이</span>
           </h1>
-          <p class="subtitle">1부터 10까지, 더하기·빼기를 놀며 배워요!</p>
+          <p class="subtitle">1부터 10까지, 더하기·빼기·한글 이름까지!</p>
         </header>
 
         <div class="friend-parade" aria-hidden="true">
@@ -58,6 +58,13 @@
               <span class="mode-desc">더하기도 빼기도 함께!</span>
             </span>
           </button>
+          <button class="mode-card mode-card--hangul" type="button" data-mode="hangul">
+            <span class="mode-icon mode-icon--hangul" aria-hidden="true">가</span>
+            <span class="mode-text">
+              <span class="mode-name">한글 놀이</span>
+              <span class="mode-desc">1 = 일, 하나처럼 읽어요</span>
+            </span>
+          </button>
         </div>
 
         <p class="sound-hint">🔊 소리를 켜면 문제를 읽어 줘요</p>
@@ -85,6 +92,7 @@
           <button class="repeat-btn" id="repeatBtn" type="button">🔈 다시 듣기</button>
         </div>
         <h1 class="question-text" id="questionText" aria-live="polite"></h1>
+        <p class="question-help" id="questionHelp">이 숫자와 짝이 되는 한글을 찾아보세요</p>
         <div class="visual-row" id="visualRow" role="img"></div>
       </div>
 

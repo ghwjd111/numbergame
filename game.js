@@ -2,7 +2,18 @@
   'use strict';
 
   const ANIMALS = ['🐠', '🐡', '🐙', '🐢', '🦀', '🐬', '🦑', '🐳', '🦐', '🦞'];
-  const PRAISE = ['정답이에요! 참 잘했어요!', '와! 맞았어요!', '최고예요!', '딩동댕! 정답이에요!'];
+  const HANGUL_NAMES = {
+    1: ['일', '하나'],
+    2: ['이', '둘'],
+    3: ['삼', '셋'],
+    4: ['사', '넷'],
+    5: ['오', '다섯'],
+    6: ['육', '여섯'],
+    7: ['칠', '일곱'],
+    8: ['팔', '여덟'],
+    9: ['구', '아홉'],
+    10: ['십', '열']
+  };
   const MODE_INFO = {
     add: { label: '더하기', icon: '➕' },
     sub: { label: '빼기', icon: '➖' },
@@ -21,6 +32,7 @@
   const modePill = document.getElementById('modePill');
   const questionCard = document.getElementById('questionCard');
   const questionText = document.getElementById('questionText');
+  const questionHelp = document.getElementById('questionHelp');
   const visualRow = document.getElementById('visualRow');
   const answers = document.getElementById('answers');
   const feedback = document.getElementById('feedback');
@@ -41,6 +53,7 @@
     locked: true,
     playing: false,
     mixStart: 'add',
+    hangulOrder: [],
     usedKeys: new Set(),
     timers: []
   };
@@ -229,6 +242,21 @@
   }
 
   function generateQuestion(mode, index) {
+    if (mode === 'hangul') {
+      const number = state.hangulOrder[index] || randomInt(1, 10);
+      const [sino, native] = HANGUL_NAMES[number];
+      return {
+        type: 'hangul',
+        number,
+        sino,
+        native,
+        answer: number,
+        key: `hangul-${number}`,
+        animal: ANIMALS[randomInt(0, ANIMALS.length - 1)],
+        options: makeOptions(number, 1, 10)
+      };
+    }
+
     let op = mode;
     if (mode === 'mix') {
       const second = state.mixStart === 'add' ? 'sub' : 'add';
@@ -279,23 +307,32 @@
     };
   }
 
-  function makeOptions(answer) {
+  function makeOptions(answer, min = 0, max = 10) {
     const options = new Set([answer]);
     const deltas = shuffle([1, -1, 2, -2, 3, -3, 4, -4]);
     for (const delta of deltas) {
       const value = answer + delta;
-      if (value >= 0 && value <= 10 && !options.has(value)) {
+      if (value >= min && value <= max && !options.has(value)) {
         options.add(value);
       }
       if (options.size === 4) break;
     }
     while (options.size < 4) {
-      options.add(randomInt(0, 10));
+      options.add(randomInt(min, max));
     }
     return shuffle(Array.from(options));
   }
 
+  function copula(word) {
+    const code = word.charCodeAt(word.length - 1);
+    if (code < 0xac00 || code > 0xd7a3) return '예요';
+    return (code - 0xac00) % 28 === 0 ? '예요' : '이에요';
+  }
+
   function questionSpeech(question) {
+    if (question.type === 'hangul') {
+      return '이 숫자와 짝이 되는 한글을 찾아보세요.';
+    }
     if (question.op === 'add') {
       return `${question.a} 더하기 ${question.b}. 모두 몇 마리일까요?`;
     }
@@ -326,24 +363,38 @@
   }
 
   function renderQuestion(question) {
-    const isAdd = question.op === 'add';
-    const info = MODE_INFO[isAdd ? 'add' : 'sub'];
+    const isHangul = question.type === 'hangul';
 
-    modePill.textContent = `${info.icon} ${info.label}`;
-    modePill.classList.remove('mode-pill--add', 'mode-pill--sub');
-    modePill.classList.add(isAdd ? 'mode-pill--add' : 'mode-pill--sub');
+    questionCard.classList.toggle('question-card--hangul', isHangul);
+    questionText.classList.toggle('is-hangul', isHangul);
+    questionHelp.classList.toggle('is-visible', isHangul);
+    modePill.classList.remove('mode-pill--add', 'mode-pill--sub', 'mode-pill--hangul');
 
-    questionText.innerHTML = `${question.a} <span class="op op--${isAdd ? 'plus' : 'minus'}">${isAdd ? '+' : '−'}</span> ${question.b} <span class="eq">=</span> <span class="qmark">?</span>`;
-
-    visualRow.className = 'visual-row';
-    if (isAdd) {
-      visualRow.classList.add('visual-row--add');
-      visualRow.innerHTML = `${makeFishGroup(question.a, 0, question.animal)}<span class="op-sign" aria-hidden="true">+</span>${makeFishGroup(question.b, 0, question.animal)}`;
-      visualRow.setAttribute('aria-label', `${question.a}마리와 ${question.b}마리, 모두 몇 마리일까요?`);
+    if (isHangul) {
+      modePill.textContent = '가 한글 놀이';
+      modePill.classList.add('mode-pill--hangul');
+      questionText.innerHTML = `<span class="hangul-numeral">${question.number}</span>`;
+      visualRow.className = 'visual-row visual-row--hangul';
+      visualRow.innerHTML = makeFishGroup(question.number, 0, question.animal);
+      visualRow.setAttribute('aria-label', `${question.number}마리`);
     } else {
-      visualRow.classList.add('visual-row--sub');
-      visualRow.innerHTML = makeFishGroup(question.a, question.b, question.animal);
-      visualRow.setAttribute('aria-label', `${question.a}마리 중 ${question.b}마리가 사라졌어요. 몇 마리 남았을까요?`);
+      const isAdd = question.op === 'add';
+      const info = MODE_INFO[isAdd ? 'add' : 'sub'];
+
+      modePill.textContent = `${info.icon} ${info.label}`;
+      modePill.classList.add(isAdd ? 'mode-pill--add' : 'mode-pill--sub');
+      questionText.innerHTML = `${question.a} <span class="op op--${isAdd ? 'plus' : 'minus'}">${isAdd ? '+' : '−'}</span> ${question.b} <span class="eq">=</span> <span class="qmark">?</span>`;
+
+      visualRow.className = 'visual-row';
+      if (isAdd) {
+        visualRow.classList.add('visual-row--add');
+        visualRow.innerHTML = `${makeFishGroup(question.a, 0, question.animal)}<span class="op-sign" aria-hidden="true">+</span>${makeFishGroup(question.b, 0, question.animal)}`;
+        visualRow.setAttribute('aria-label', `${question.a}마리와 ${question.b}마리, 모두 몇 마리일까요?`);
+      } else {
+        visualRow.classList.add('visual-row--sub');
+        visualRow.innerHTML = makeFishGroup(question.a, question.b, question.animal);
+        visualRow.setAttribute('aria-label', `${question.a}마리 중 ${question.b}마리가 사라졌어요. 몇 마리 남았을까요?`);
+      }
     }
 
     answers.innerHTML = '';
@@ -352,8 +403,17 @@
       button.type = 'button';
       button.className = 'answer-btn';
       button.dataset.value = String(value);
-      button.textContent = String(value);
-      button.setAttribute('aria-label', `${value}`);
+
+      if (isHangul) {
+        const [sino, native] = HANGUL_NAMES[value];
+        button.classList.add('answer-btn--hangul');
+        button.innerHTML = `<span class="hangul-pair">${sino}<span class="pair-sep" aria-hidden="true">,</span> ${native}</span>`;
+        button.setAttribute('aria-label', `${sino}, ${native}`);
+      } else {
+        button.textContent = String(value);
+        button.setAttribute('aria-label', `${value}`);
+      }
+
       button.addEventListener('click', (event) => handleAnswer(value, button, event));
       answers.appendChild(button);
     });
@@ -388,6 +448,7 @@
     state.locked = false;
     state.playing = true;
     state.mixStart = Math.random() < 0.5 ? 'add' : 'sub';
+    state.hangulOrder = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     state.usedKeys = new Set();
     scoreText.classList.remove('bump');
     updateProgress(false);
@@ -426,18 +487,28 @@
       questionCard.classList.add('is-happy');
       sound.correct();
       spawnBurst(centerX, centerY, 20);
-      setFeedback('정답이에요! ⭐', 'ok');
+      if (question.type === 'hangul') {
+        setFeedback(`정답이에요! ${question.sino}, ${question.native}`, 'ok');
+        sound.speak(`정답이에요! ${question.sino}, ${question.native}!`, 280);
+      } else {
+        setFeedback('정답이에요! ⭐', 'ok');
+        sound.speak(`정답이에요! ${equationSpeech(question)}!`, 280);
+      }
       scoreText.classList.remove('bump');
       void scoreText.offsetWidth;
       scoreText.classList.add('bump');
-      sound.speak(`정답이에요! ${equationSpeech(question)}!`, 280);
     } else {
       button.classList.remove('is-correct');
       button.classList.add('is-wrong');
       sound.wrong();
       spawnBurst(centerX, centerY, 9, ['🫧', '💧', '✨']);
-      setFeedback(`정답은 ${question.answer}예요. 괜찮아요!`, 'try');
-      sound.speak(`아쉬워요. 정답은 ${question.answer}예요. 괜찮아요!`, 320);
+      if (question.type === 'hangul') {
+        setFeedback(`정답은 ${question.sino}, ${question.native}${copula(question.native)}`, 'try');
+        sound.speak(`아쉬워요. ${question.sino}, ${question.native}${copula(question.native)}. 괜찮아요!`, 320);
+      } else {
+        setFeedback(`정답은 ${question.answer}예요. 괜찮아요!`, 'try');
+        sound.speak(`아쉬워요. 정답은 ${question.answer}예요. 괜찮아요!`, 320);
+      }
     }
 
     updateProgress(true);
@@ -460,7 +531,12 @@
     showScreen('end');
 
     const stars = state.score >= 9 ? 3 : state.score >= 6 ? 2 : 1;
-    const title = state.score >= 9 ? '바다의 숫자 왕!' : state.score >= 6 ? '정말 잘했어요!' : state.score >= 3 ? '잘하고 있어요!' : '끝까지 해냈어요!';
+    let title;
+    if (state.mode === 'hangul') {
+      title = state.score >= 9 ? '한글 숫자 박사!' : state.score >= 6 ? '한글 이름 척척!' : state.score >= 3 ? '한글 놀이 재밌어요!' : '끝까지 해냈어요!';
+    } else {
+      title = state.score >= 9 ? '바다의 숫자 왕!' : state.score >= 6 ? '정말 잘했어요!' : state.score >= 3 ? '잘하고 있어요!' : '끝까지 해냈어요!';
+    }
 
     endTitle.textContent = title;
     endScore.textContent = `${state.total}문제 중 ${state.score}개를 맞혔어요!`;

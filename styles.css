@@ -242,10 +242,10 @@ button:focus-visible {
 
 .mode-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(10px, 1.8vw, 18px);
   width: 100%;
-  max-width: 800px;
+  max-width: 940px;
   margin: 0 auto;
 }
 
@@ -307,6 +307,35 @@ button:focus-visible {
 
 .mode-card--mix {
   background: linear-gradient(155deg, #c4b5fd 0%, #8b5cf6 60%, #6366f1 100%);
+}
+
+.mode-card--hangul {
+  color: #78350f;
+  background: linear-gradient(155deg, #fef08a 0%, #fbbf24 58%, #f59e0b 100%);
+}
+
+.mode-card--hangul::before {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.mode-card--hangul::after {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mode-card--hangul .mode-name {
+  color: #78350f;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.mode-card--hangul .mode-desc {
+  color: #92400e;
+}
+
+.mode-icon--hangul {
+  color: #92400e;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.25rem);
+  background: rgba(255, 255, 255, 0.48);
 }
 
 .mode-card:hover {
@@ -533,6 +562,12 @@ button:focus-visible {
   color: #0369a1;
 }
 
+.mode-pill--hangul {
+  border-color: #fde68a;
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .repeat-btn {
   display: inline-flex;
   align-items: center;
@@ -593,6 +628,31 @@ button:focus-visible {
   animation: questionBounce 1.5s ease-in-out infinite;
 }
 
+.question-text.is-hangul {
+  margin: 2px 0 0;
+  font-size: clamp(4.2rem, 15vw, 6.4rem);
+  line-height: 1;
+  text-shadow: 0 4px 0 #bae6fd;
+}
+
+.question-card--hangul::before {
+  background: rgba(254, 240, 138, 0.6);
+}
+
+.question-help {
+  display: none;
+  margin: 2px 0 10px;
+  color: #0e7490;
+  font-size: clamp(1.08rem, 2.8vw, 1.28rem);
+  line-height: 1.25;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.question-help.is-visible {
+  display: block;
+}
+
 .visual-row {
   display: flex;
   flex-wrap: wrap;
@@ -628,6 +688,11 @@ button:focus-visible {
 .visual-row--sub .fish-group {
   max-width: 100%;
   padding-inline: clamp(12px, 3vw, 22px);
+}
+
+.visual-row--hangul .fish-group {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(254, 249, 195, 0.76);
 }
 
 .fish {
@@ -711,6 +776,28 @@ button:focus-visible {
 
 .answer-btn:nth-child(4) {
   background: linear-gradient(155deg, #f5f3ff, #ddd6fe);
+}
+
+.answer-btn--hangul {
+  font-size: clamp(1.55rem, 5.2vw, 2.2rem);
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.hangul-pair {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.hangul-pair .pair-sep {
+  color: #64748b;
+  font-size: 0.92em;
+}
+
+.answer-btn--hangul.is-correct .pair-sep,
+.answer-btn--hangul.is-wrong .pair-sep {
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .answer-btn:hover:not(:disabled) {
@@ -1167,7 +1254,7 @@ button:focus-visible {
 
   .mode-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
     max-width: 420px;
   }
 
@@ -1176,17 +1263,17 @@ button:focus-visible {
     align-items: center;
     justify-content: flex-start;
     min-height: 0;
-    padding: 14px 18px;
-    border-radius: 26px;
+    padding: 10px 16px;
+    border-radius: 24px;
     text-align: left;
-    gap: 14px;
+    gap: 12px;
   }
 
   .mode-icon {
     flex: 0 0 auto;
-    width: 58px;
-    height: 58px;
-    font-size: 1.85rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.7rem;
   }
 
   .mode-text {
@@ -1196,12 +1283,12 @@ button:focus-visible {
 
   .mode-name {
     margin-top: 0;
-    font-size: 1.65rem;
+    font-size: 1.55rem;
   }
 
   .mode-desc {
     margin-top: 2px;
-    font-size: 0.98rem;
+    font-size: 0.94rem;
   }
 
   .mode-card::before {
@@ -1211,7 +1298,11 @@ button:focus-visible {
   }
 
   .friend-parade {
-    margin-block: 20px 24px;
+    margin-block: 16px 20px;
+  }
+
+  .sound-hint {
+    margin-top: 18px;
   }
 
   .game-top {
@@ -1292,11 +1383,16 @@ button:focus-visible {
     border-radius: 22px;
   }
 
+  .answer-btn--hangul {
+    font-size: clamp(1.3rem, 5.8vw, 1.8rem);
+  }
+
   .progress-meta {
     font-size: 0.86rem;
   }
 
   .feedback {
+    max-width: 100%;
     font-size: 1.1rem;
   }
 
